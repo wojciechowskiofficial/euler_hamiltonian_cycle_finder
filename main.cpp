@@ -4,6 +4,8 @@
 #include "Generator.h"
 
 int main() {
-	std::cout << "hello cycles!!!" << std::endl;
+	Generator * test = new Generator(10, 0.3);
+	delete test;
+	std::cout << test->v_nr << std::endl;
 	return 0;
 }
