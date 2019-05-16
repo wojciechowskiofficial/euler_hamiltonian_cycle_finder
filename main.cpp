@@ -2,10 +2,9 @@
 
 #include "Utility.h"
 #include "Generator.h"
+#include "Fixed_stack.h"
 
 int main() {
-	Generator * test = new Generator(10, 0.3);
-	delete test;
-	std::cout << test->v_nr << std::endl;
+	std::cout << "hello cycles!!!" << std::endl;
 	return 0;
 }

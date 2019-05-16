@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <math.h>
+#include <stack>
 
 Generator::Generator(int v_nr, float saturation) {
 	this->v_nr = v_nr;
@@ -24,4 +25,18 @@ Generator::~Generator() {
 		delete [] this->graph;
 		this->graph = NULL;
 	}
+}
+
+//todo: robimy posortowana liste wszystkich indeksow wierzcholkow
+        //shufflujemy O(n) te liste
+        //robimy z niej stos w sumie
+        //popujemy 1 element i dodajemy go do listy zrobionych
+        //dopoki pierwsza lista jest nie pusta robimy:
+        //pop
+        //bierzemy radnom indeks z listy zrobionych i laczymy z popem
+        //zwiekszamy pointer o jeden na zrobionych i spopowany vertex
+
+void Generator::euler_generate() {
+	int * unvisited = new int [this->v_nr];
+	
 }

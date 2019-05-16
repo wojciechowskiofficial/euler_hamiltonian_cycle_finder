@@ -5,5 +5,5 @@ class Generator {
 		int v_nr, e_nr;
 		float saturation;
 		int ** graph;
-		void test();
+		void euler_generate();
 };
