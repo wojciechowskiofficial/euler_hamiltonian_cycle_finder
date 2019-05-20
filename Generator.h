@@ -7,4 +7,5 @@ class Generator {
 		int ** graph;
 		bool add(int a, int b);
 		void euler_generate();
+		int ** parity;
 };
