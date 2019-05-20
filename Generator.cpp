@@ -29,14 +29,6 @@ Generator::~Generator() {
 		delete [] this->graph;
 		this->graph = NULL;
 	}
-	if (this->parity != NULL) {
-		for (int i = 0; i < this->v_nr; i++) {
-			delete this->parity[i];
-			this->parity[i] = NULL;
-		}
-		delete [] this->parity;
-		this->parity = NULL;
-	}
 }
 
 bool Generator::add(int a, int b) {
@@ -51,44 +43,45 @@ bool Generator::add(int a, int b) {
 
 void Generator::euler_generate() {
 	int * unvisited = new int [this->v_nr];
-	this->parity = new int * [this->v_nr];
 	for (int i = 0; i < this->v_nr; i++) {
 		unvisited[i] = i;
-		this->parity[i] = new int [2];
-		this->parity[i][0] = 0;
-		this->parity[i][1] = i;
 	}
 	Utility * utility = new Utility();
 	utility->shuffle(unvisited, this->v_nr);
-	std::stack<int> stack;
+	delete utility;
+	utility = NULL;
+	std::stack<int> unvisited_stack;
 	for (int i = this->v_nr - 1; i >= 0; i--) {
-		stack.push(unvisited[i]);
+		unvisited_stack.push(unvisited[i]);
 	}
 	delete [] unvisited;
 	unvisited = NULL;
-	std::vector<int> vector;
-	vector.push_back(stack.top());
-	stack.pop();
-	vector.push_back(stack.top());
-	stack.pop();
-	this->add(vector.at(0), vector.at(1));
-	srand(time(NULL));
-	while (stack.size() > 0) {
-		this->add(stack.top(), vector.at(rand() % vector.size()));
-		vector.push_back(stack.top());
-		stack.pop();
-	}
-
+	
+	int parity_pointer = 1;
+	this->parity = new int * [this->v_nr];
 	for (int i = 0; i < this->v_nr; i++) {
-		for (int j = 0; j < this->v_nr; j++) {
-			std::cout << this->graph[i][j] << " ";
-			if (this->graph[i][j] == 1) {
-				parity[i][0]++;
-			}
-		}
-		std::cout << parity[i][0] << std::endl;
+		this->parity[i] = new int [2];
+		this->parity[i][0] = i;
+		this->parity[i][1] = 0;
 	}
-
+	this->parity[0][0] = unvisited_stack.top();
+	unvisited_stack.pop();
+	this->parity[1][0] = unvisited_stack.top();
+	unvisited_stack.pop();
+	this->add(this->parity[0][0], this->parity[1][0]);
+	this->parity[0][1]++;
+	this->parity[1][1]++;
+	srand(time(NULL));
+	int rand_tmp;
+	while (unvisited_stack.size() > 0) {
+		rand_tmp = rand() % parity_pointer + 1;
+		this->add(unvisited_stack.top(), this->parity[rand_tmp][0]);
+		this->parity[rand_tmp][1]++;
+		parity_pointer++;
+		this->parity[parity_pointer][0] = unvisited_stack.top();
+		this->parity[parity_pointer][1]++;
+		unvisited_stack.pop();
+	}
 	//TODO:
 	//*robimy vector dwuelementowych tablic:
 	//	elementy vectora reprezentuja wierzcholki
@@ -100,4 +93,5 @@ void Generator::euler_generate() {
 	//*zwiekszamy licznik sasiadow na tych wierzcholkach o jeden
 	//*jezeli vector nieparzystych wierzcholkow jest <= 2 to konczymy
 	//*jezeli nie to wykonujemy procedure "usun" i powtarzamy kroki od @
+	
 }
