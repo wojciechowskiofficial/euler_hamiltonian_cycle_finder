@@ -82,16 +82,15 @@ void Generator::euler_generate() {
 		this->parity[parity_pointer][1]++;
 		unvisited_stack.pop();
 	}
+	int left_to_add = this->e_nr - this->v_nr + 1;
 	//TODO:
-	//*robimy vector dwuelementowych tablic:
-	//	elementy vectora reprezentuja wierzcholki
-	//	2D to tablica dwuelementowa
-	//		t[0] indeks nieparzystosci
-	//		t[1] to ilosc sasiadow
-	//*@obliczamy ile jeszcze mamy doddac edgow ze wzoru this->e_nr - (this->v_nr) + 1
+	//lecimy przez cala tablice parity i dodajemy na przyklad kolejne nieparzyste wierzcholki (np z 2 pointerami tak zeby zostaly 2 nieparzyste
+	//jesli za male nasycenie to laczymy zawsze nieparzyste z dwoma roznymi parzystymi utrzymujac nieparzystosc na poziomie zawsze dwoch a na koncu laczymy dwa nieparzyste
+	//a jak za duze nasycenie no to po dwa odejmowac od tych co maja po 
+	//TODO:
 	//*dodajemy tyle edgow laczac 2 randomowe, rozne, nieparzyste wierzcholki majace wiecej niz 1 sasiadow
 	//*zwiekszamy licznik sasiadow na tych wierzcholkach o jeden
-	//*jezeli vector nieparzystych wierzcholkow jest <= 2 to konczymy
+	//*jezeli vector nieparzystych wierzcholkow jest rowny 0 to konczymy
 	//*jezeli nie to wykonujemy procedure "usun" i powtarzamy kroki od @
 	
 }
