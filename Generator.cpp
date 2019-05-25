@@ -33,6 +33,7 @@ Generator::~Generator() {
 
 bool Generator::add(int a, int b) {
 	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
+		std::cout << "add" << std::endl;
 		return false;
 	}
 	else {
@@ -41,56 +42,107 @@ bool Generator::add(int a, int b) {
 	}
 }
 
-void Generator::euler_generate() {
-	int * unvisited = new int [this->v_nr];
+bool Generator::is_edge(int a, int b) {
+	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
+		std::cout << "is_edge" << std::endl;
+	}
+	if (this->graph[a][b] == 1) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
+void Generator::display() {
 	for (int i = 0; i < this->v_nr; i++) {
+		for (int j = 0; j < this->v_nr; j++) {
+			std::cout << this->graph[i][j] << " ";
+		}
+		std::cout << std::endl;
+	}
+}
+
+void Generator::euler_generate() {
+	int * unvisited = new int [this->v_nr - 1];
+	for (int i = 0; i < this->v_nr - 1; i++) {
 		unvisited[i] = i;
 	}
 	Utility * utility = new Utility();
-	utility->shuffle(unvisited, this->v_nr);
+	utility->shuffle(unvisited, this->v_nr - 1);
 	delete utility;
 	utility = NULL;
 	std::stack<int> unvisited_stack;
-	for (int i = this->v_nr - 1; i >= 0; i--) {
+	for (int i = this->v_nr - 2; i >= 0; i--) {
 		unvisited_stack.push(unvisited[i]);
 	}
 	delete [] unvisited;
 	unvisited = NULL;
-	
-	int parity_pointer = 1;
-	this->parity = new int * [this->v_nr];
-	for (int i = 0; i < this->v_nr; i++) {
-		this->parity[i] = new int [2];
-		this->parity[i][0] = i;
-		this->parity[i][1] = 0;
-	}
-	this->parity[0][0] = unvisited_stack.top();
+
+	int * visited = new int [this->v_nr - 1];
+	visited[0] = unvisited_stack.top();
 	unvisited_stack.pop();
-	this->parity[1][0] = unvisited_stack.top();
+	visited[1] = unvisited_stack.top();
 	unvisited_stack.pop();
-	this->add(this->parity[0][0], this->parity[1][0]);
-	this->parity[0][1]++;
-	this->parity[1][1]++;
+	this->add(visited[0], visited[1]);
+	int visited_pointer = 2;
 	srand(time(NULL));
 	int rand_tmp;
 	while (unvisited_stack.size() > 0) {
-		rand_tmp = rand() % parity_pointer + 1;
-		this->add(unvisited_stack.top(), this->parity[rand_tmp][0]);
-		this->parity[rand_tmp][1]++;
-		parity_pointer++;
-		this->parity[parity_pointer][0] = unvisited_stack.top();
-		this->parity[parity_pointer][1]++;
+		rand_tmp = rand() % visited_pointer;
+		this->add(unvisited_stack.top(), visited[rand_tmp]);
+		visited[visited_pointer++] = unvisited_stack.top();
 		unvisited_stack.pop();
+
 	}
-	int left_to_add = this->e_nr - this->v_nr + 1;
-	//TODO:
-	//lecimy przez cala tablice parity i dodajemy na przyklad kolejne nieparzyste wierzcholki (np z 2 pointerami tak zeby zostaly 2 nieparzyste
-	//jesli za male nasycenie to laczymy zawsze nieparzyste z dwoma roznymi parzystymi utrzymujac nieparzystosc na poziomie zawsze dwoch a na koncu laczymy dwa nieparzyste
-	//a jak za duze nasycenie no to po dwa odejmowac od tych co maja po 
-	//TODO:
-	//*dodajemy tyle edgow laczac 2 randomowe, rozne, nieparzyste wierzcholki majace wiecej niz 1 sasiadow
-	//*zwiekszamy licznik sasiadow na tych wierzcholkach o jeden
-	//*jezeli vector nieparzystych wierzcholkow jest rowny 0 to konczymy
-	//*jezeli nie to wykonujemy procedure "usun" i powtarzamy kroki od @
+	std::vector<int> odd;
+	int odd_counter = 0;
+	for (int i = 0; i < this->v_nr; i++) {
+		for (int j = 0; j < this->v_nr; j++) {
+			if (this->is_edge(i, j)) {
+				odd_counter++;
+			}
+		}
+		if (odd_counter % 2 != 0) {
+			odd.push_back(i);
+		}
+		odd_counter = 0;
+	}
+	for (int i = 0; i < odd.size(); i++) {
+		std::cout << odd.at(i) << std::endl;
+	}
+
+	int connect[2];
+	odd_counter = 0;
+	while (odd.size() > 2) {
+		connect[0] = rand() % odd.size();
+		connect[1] = rand() % odd.size();
+		while (connect[0] == connect[1] || is_edge(odd.at(connect[0]), odd.at(connect[1]))) {
+			connect[odd_counter % 2] = rand() % odd.size();
+			odd_counter++;
+		}
+		this->add(odd.at(connect[0]), odd.at(connect[1]));
+		odd.erase(odd.begin() + connect[0]);
+		if (connect[0] < connect[1]) {
+			connect[1]--;
+		}
+		odd.erase(odd.begin() + connect[1]);
+	}
+	if (odd.size() == 2) {
+		this->add(odd.at(0), this->v_nr - 1);
+		this->add(odd.at(1), this->v_nr - 1);
+	}
 	
+	int edge_count = 0;
+	for (int i = 0; i < this->v_nr; i++) {
+		for (int j = 0; j < this->v_nr; j++) {
+			if (this->graph[i][j] == 1) {
+				edge_count++;
+			}
+		}
+	}
+	this->display();
+	edge_count /= 2;
+	std::cout << edge_count << std::endl;
+	std::cout << this->e_nr << std::endl;
 }
