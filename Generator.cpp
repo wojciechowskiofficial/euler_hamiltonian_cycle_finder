@@ -141,8 +141,23 @@ void Generator::euler_generate() {
 			}
 		}
 	}
-	this->display();
 	edge_count /= 2;
-	std::cout << edge_count << std::endl;
-	std::cout << this->e_nr << std::endl;
+	int triangle[3];
+	odd_counter = 0;
+	std::cout << this->e_nr << " " << edge_count << std::endl;
+	while (this->e_nr - edge_count >= 2) {
+		triangle[0] = rand() % this->v_nr;
+		triangle[1] = rand() % this->v_nr;
+		triangle[2] = rand() % this->v_nr;
+		while (this->is_edge(triangle[0], triangle[1]) || this->is_edge(triangle[1], triangle[2]) || this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
+			triangle[odd_counter % 3] = rand() % this->v_nr;
+			odd_counter++;
+		}
+		this->add(triangle[0], triangle[1]);
+		this->add(triangle[1], triangle[2]);
+		this->add(triangle[2], triangle[0]);
+		edge_count += 3;
+	}
+	std::cout << "nasycenie" << this->e_nr << " faktyczne " << edge_count << std::endl;
+	this->display();
 }
