@@ -59,7 +59,7 @@ void Generator::display() {
 	}
 }
 
-void Generator::euler_generate() {
+bool Generator::euler_generate() {
 	int * unvisited = new int [this->v_nr - 1];
 	for (int i = 0; i < this->v_nr - 1; i++) {
 		unvisited[i] = i;
@@ -103,6 +103,10 @@ void Generator::euler_generate() {
 			odd.push_back(i);
 		}
 		odd_counter = 0;
+	}
+
+	if (odd.size() == 0) {
+		return false;
 	}
 
 	int connect[2];
@@ -150,6 +154,7 @@ void Generator::euler_generate() {
 		this->add(triangle[2], triangle[0]);
 		edge_count += 3;
 	}
+	return true;
 }
 
 bool Generator::is_eulerian() {
