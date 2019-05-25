@@ -33,7 +33,6 @@ Generator::~Generator() {
 
 bool Generator::add(int a, int b) {
 	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
-		std::cout << "add" << std::endl;
 		return false;
 	}
 	else {
@@ -43,9 +42,6 @@ bool Generator::add(int a, int b) {
 }
 
 bool Generator::is_edge(int a, int b) {
-	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
-		std::cout << "is_edge" << std::endl;
-	}
 	if (this->graph[a][b] == 1) {
 		return true;
 	}
@@ -108,9 +104,6 @@ void Generator::euler_generate() {
 		}
 		odd_counter = 0;
 	}
-	for (int i = 0; i < odd.size(); i++) {
-		std::cout << odd.at(i) << std::endl;
-	}
 
 	int connect[2];
 	odd_counter = 0;
@@ -144,7 +137,6 @@ void Generator::euler_generate() {
 	edge_count /= 2;
 	int triangle[3];
 	odd_counter = 0;
-	std::cout << this->e_nr << " " << edge_count << std::endl;
 	while (this->e_nr - edge_count >= 2) {
 		triangle[0] = rand() % this->v_nr;
 		triangle[1] = rand() % this->v_nr;
@@ -158,6 +150,20 @@ void Generator::euler_generate() {
 		this->add(triangle[2], triangle[0]);
 		edge_count += 3;
 	}
-	std::cout << "nasycenie" << this->e_nr << " faktyczne " << edge_count << std::endl;
-	this->display();
+}
+
+bool Generator::is_eulerian() {
+	int odd_counter = 0;
+	for (int i = 0; i < this->v_nr; i++) {
+		for (int j = 0; j < this->v_nr; j++) {
+			if (this->graph[i][j] == 1) {
+				odd_counter++;
+			}
+		}
+		if (odd_counter % 2 != 0 || odd_counter == 0) {
+			return false;
+		}
+		odd_counter = 0;
+	}
+	return true;
 }

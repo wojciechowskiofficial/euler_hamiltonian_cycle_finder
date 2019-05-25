@@ -9,4 +9,5 @@ class Generator {
 		void euler_generate();
 		bool is_edge(int a, int b);
 		void display();
+		bool is_eulerian();
 };
