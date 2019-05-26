@@ -1,3 +1,5 @@
+#include <vector>
+
 class Eulerian_cycle {
 	public:
 		int ** graph;
@@ -9,4 +11,9 @@ class Eulerian_cycle {
 		bool add(int a, int b);
 		void display();
 		void load();
+		std::vector<int> seq;
+		bool are_adjecent(int a);
+		int first_adjecent(int a);
+		bool del_edge(int a, int b);
+		double perform();
 };

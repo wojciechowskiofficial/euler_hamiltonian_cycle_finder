@@ -1,7 +1,9 @@
 #include "Eulerian_cycle.h"
 #include <cstdlib>
 #include <iostream>
+#include <stack>
 #include "Generator.h"
+#include <ctime>
 
 Eulerian_cycle::Eulerian_cycle(int v_nr, float saturation) {
 	this->v_nr = v_nr;
@@ -69,9 +71,57 @@ void Eulerian_cycle::load() {
 		}
 	}
 	this->e_nr = gen->e_nr;
-	gen->display();
 	std::cout << std::endl;
-	this->display();
 	delete gen;
 	gen = NULL;
+}
+
+bool Eulerian_cycle::are_adjecent(int a) {
+	for (int i = 0; i < this->v_nr; i++) {
+		if (this->is_edge(a, i)) {
+			return true;
+		}
+	}
+	return false;
+}
+
+int Eulerian_cycle::first_adjecent(int a) {
+	for (int i = 0; i < this->v_nr; i++) {
+		if (this->graph[a][i] == 1) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+bool Eulerian_cycle::del_edge(int a, int b) {
+	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
+		return false;
+	}
+	this->graph[a][b] = 0;
+	this->graph[b][a] = 0;
+}
+
+double Eulerian_cycle::perform() {
+	clock_t begin, end;
+	begin = clock();
+	std::stack<int> util_stack;
+	int v = 0;
+	int u;
+	util_stack.push(v);
+	while (!util_stack.empty()) {
+		v = util_stack.top();
+		if (this->are_adjecent(v)) {
+			u = this->first_adjecent(v);
+			util_stack.push(u);
+			this->del_edge(u, v);
+			v = u;
+		}
+		else {
+			util_stack.pop();
+			this->seq.push_back(v);
+		}
+	}
+	end = clock();
+	return double (end - begin) / CLOCKS_PER_SEC;
 }
