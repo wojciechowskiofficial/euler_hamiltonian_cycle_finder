@@ -153,6 +153,8 @@ bool Generator::euler_generate() {
 		this->add(triangle[1], triangle[2]);
 		this->add(triangle[2], triangle[0]);
 		edge_count += 3;
+		std::cout << std::endl;
+		this->display();
 	}
 	return true;
 }

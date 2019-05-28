@@ -61,7 +61,10 @@ void Eulerian_cycle::load() {
 	bool tmp_bool;
 	tmp_bool = gen->euler_generate();
 	while (!tmp_bool) {
-		gen->euler_generate();
+		delete gen;
+		gen = NULL;
+		gen = new Generator(this->v_nr, this->saturation);
+		tmp_bool = gen->euler_generate();
 	}
 	for (int i = 0; i < this->v_nr; i++) {
 		for (int j = 0; j < this->v_nr; j++) {
@@ -71,7 +74,6 @@ void Eulerian_cycle::load() {
 		}
 	}
 	this->e_nr = gen->e_nr;
-	std::cout << std::endl;
 	delete gen;
 	gen = NULL;
 }
