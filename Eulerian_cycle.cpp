@@ -29,7 +29,7 @@ Eulerian_cycle::~Eulerian_cycle() {
 }
 
 bool Eulerian_cycle::add(int a, int b) {
-	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
+	if (a < 0 || b < 0 || a >= this->v_nr || b >= this->v_nr) {
 		return false;
 	}
 	else {
@@ -97,7 +97,10 @@ int Eulerian_cycle::first_adjecent(int a) {
 }
 
 bool Eulerian_cycle::del_edge(int a, int b) {
-	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
+	if (a < 0 || b < 0 || a >= this->v_nr || b >= this->v_nr) {
+		return false;
+	}
+	if (!this->is_edge(a, b)) {
 		return false;
 	}
 	this->graph[a][b] = 0;

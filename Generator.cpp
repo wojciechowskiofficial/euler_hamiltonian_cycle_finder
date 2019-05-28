@@ -10,6 +10,7 @@
 
 Generator::Generator(int v_nr, float saturation) {
 	this->v_nr = v_nr;
+	this->saturation = saturation;
 	this->e_nr = round(saturation * this->v_nr * (this->v_nr - 1) / 2);
 	this->graph = new int * [this->v_nr];
 	for (int i = 0; i < this->v_nr; i++) {
@@ -32,12 +33,22 @@ Generator::~Generator() {
 }
 
 bool Generator::add(int a, int b) {
-	if (a < 0 || b < 0 || a > this->v_nr || b > this->v_nr) {
+	if (a < 0 || b < 0 || a >= this->v_nr || b >= this->v_nr) {
 		return false;
 	}
 	else {
 		this->graph[a][b] = 1;
 		this->graph[b][a] = 1;
+	}
+}
+
+bool Generator::del(int a, int b) {
+	if (a < 0 || b < 0 || a >= this->v_nr || b >= this->v_nr) {
+		return false;
+	}
+	else {
+		this->graph[a][b] = 0;
+		this->graph[b][a] = 0;
 	}
 }
 
@@ -59,23 +70,23 @@ void Generator::display() {
 	}
 }
 
-bool Generator::euler_generate() {
+bool Generator::connected_generate() {
 	int * unvisited = new int [this->v_nr - 1];
-	for (int i = 0; i < this->v_nr - 1; i++) {
+	for (int i = 0; i < this->v_nr; i++) {
 		unvisited[i] = i;
 	}
 	Utility * utility = new Utility();
-	utility->shuffle(unvisited, this->v_nr - 1);
+	utility->shuffle(unvisited, this->v_nr);
 	delete utility;
 	utility = NULL;
 	std::stack<int> unvisited_stack;
-	for (int i = this->v_nr - 2; i >= 0; i--) {
+	for (int i = this->v_nr - 1; i >= 0; i--) {
 		unvisited_stack.push(unvisited[i]);
 	}
 	delete [] unvisited;
 	unvisited = NULL;
 
-	int * visited = new int [this->v_nr - 1];
+	int * visited = new int [this->v_nr];
 	visited[0] = unvisited_stack.top();
 	unvisited_stack.pop();
 	visited[1] = unvisited_stack.top();
@@ -91,72 +102,122 @@ bool Generator::euler_generate() {
 		unvisited_stack.pop();
 
 	}
-	std::vector<int> odd;
-	int odd_counter = 0;
-	for (int i = 0; i < this->v_nr; i++) {
-		for (int j = 0; j < this->v_nr; j++) {
-			if (this->is_edge(i, j)) {
+	return this->is_connected();
+}
+
+bool Generator::euler_generate() {
+	this->connected_generate();
+
+	if (this->saturation >= 0.1) {
+		for (int i = 0; i < this->v_nr; i++) {
+			for (int j = 0; j < this->v_nr; j++) {
+				if (i == j) {
+					continue;
+				}
+				this->graph[i][j] = 1;
+			}
+		}
+		int edge_count = this->v_nr * (this->v_nr - 1) / 2;
+		if (this->v_nr % 2 == 0) {
+			for (int i = this->v_nr - 1; i >= 0; i--) {
+				this->del(i, this->v_nr - 1 - i);
+			}
+			edge_count = this->v_nr * (this->v_nr - 2) / 2;
+		}
+		int triangle[3];
+		int odd_counter = 0;
+		while (edge_count - this->e_nr >= 2) {
+			triangle[0] = rand() % this->v_nr;
+			triangle[1] = rand() % this->v_nr;
+			triangle[2] = rand() % this->v_nr;
+			while (!this->is_edge(triangle[0], triangle[1]) || !this->is_edge(triangle[1], triangle[2]) || !this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
+				triangle[odd_counter % 3] = rand() % this->v_nr;
 				odd_counter++;
 			}
+			this->del(triangle[0], triangle[1]);
+			this->del(triangle[1], triangle[2]);
+			this->del(triangle[2], triangle[0]);
+			edge_count -= 3;
+			//std::cout << std::endl;
+			//this->display();
 		}
-		if (odd_counter % 2 != 0) {
-			odd.push_back(i);
+		return this->is_eulerian();
+	}
+	/*
+	else {
+	//usunac ostatni wierzcholek
+		std::cout << "weszlo" << std::endl;
+		std::vector<int> odd;
+		int odd_counter = 0;
+		for (int i = 0; i < this->v_nr; i++) {
+			for (int j = 0; j < this->v_nr; j++) {
+				if (this->is_edge(i, j)) {
+					odd_counter++;
+				}
+			}
+			if (odd_counter % 2 != 0) {
+				odd.push_back(i);
+			}
+			odd_counter = 0;
 		}
+
+		if (odd.size() == 0) {
+			return false;
+		}
+
+		int connect[2];
 		odd_counter = 0;
-	}
-
-	if (odd.size() == 0) {
-		return false;
-	}
-
-	int connect[2];
-	odd_counter = 0;
-	while (odd.size() > 2) {
-		connect[0] = rand() % odd.size();
-		connect[1] = rand() % odd.size();
-		while (connect[0] == connect[1] || is_edge(odd.at(connect[0]), odd.at(connect[1]))) {
-			connect[odd_counter % 2] = rand() % odd.size();
-			odd_counter++;
+		while (odd.size() > 2) {
+			connect[0] = rand() % odd.size();
+			connect[1] = rand() % odd.size();
+			while (connect[0] == connect[1] || is_edge(odd.at(connect[0]), odd.at(connect[1]))) {
+				connect[odd_counter % 2] = rand() % odd.size();
+				odd_counter++;
+			}
+			this->add(odd.at(connect[0]), odd.at(connect[1]));
+			odd.erase(odd.begin() + connect[0]);
+			if (connect[0] < connect[1]) {
+				connect[1]--;
+			}
+			odd.erase(odd.begin() + connect[1]);
 		}
-		this->add(odd.at(connect[0]), odd.at(connect[1]));
-		odd.erase(odd.begin() + connect[0]);
-		if (connect[0] < connect[1]) {
-			connect[1]--;
+		if (odd.size() == 2) {
+			this->add(odd.at(0), this->v_nr - 1);
+			this->add(odd.at(1), this->v_nr - 1);
 		}
-		odd.erase(odd.begin() + connect[1]);
-	}
-	if (odd.size() == 2) {
-		this->add(odd.at(0), this->v_nr - 1);
-		this->add(odd.at(1), this->v_nr - 1);
-	}
-	
-	int edge_count = 0;
-	for (int i = 0; i < this->v_nr; i++) {
-		for (int j = 0; j < this->v_nr; j++) {
-			if (this->graph[i][j] == 1) {
-				edge_count++;
+		
+		int edge_count = 0;
+		for (int i = 0; i < this->v_nr; i++) {
+			for (int j = 0; j < this->v_nr; j++) {
+				if (this->graph[i][j] == 1) {
+					edge_count++;
+				}
 			}
 		}
-	}
-	edge_count /= 2;
-	int triangle[3];
-	odd_counter = 0;
-	while (this->e_nr - edge_count >= 2) {
-		triangle[0] = rand() % this->v_nr;
-		triangle[1] = rand() % this->v_nr;
-		triangle[2] = rand() % this->v_nr;
-		while (this->is_edge(triangle[0], triangle[1]) || this->is_edge(triangle[1], triangle[2]) || this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
-			triangle[odd_counter % 3] = rand() % this->v_nr;
-			odd_counter++;
+		edge_count /= 2;
+		int triangle[3];
+		odd_counter = 0;
+		while (this->e_nr - edge_count >= 2) {
+			triangle[0] = rand() % this->v_nr;
+			triangle[1] = rand() % this->v_nr;
+			triangle[2] = rand() % this->v_nr;
+			while (this->is_edge(triangle[0], triangle[1]) || this->is_edge(triangle[1], triangle[2]) || this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
+				triangle[odd_counter % 3] = rand() % this->v_nr;
+				odd_counter++;
+			}
+			this->add(triangle[0], triangle[1]);
+			this->add(triangle[1], triangle[2]);
+			this->add(triangle[2], triangle[0]);
+			edge_count += 3;
+			std::cout << std::endl;
+			this->display();
 		}
-		this->add(triangle[0], triangle[1]);
-		this->add(triangle[1], triangle[2]);
-		this->add(triangle[2], triangle[0]);
-		edge_count += 3;
-		std::cout << std::endl;
-		this->display();
+		if (!this->is_eulerian()) {
+			return false;
+		}
+		return true;
 	}
-	return true;
+	*/
 }
 
 bool Generator::is_eulerian() {
@@ -173,4 +234,18 @@ bool Generator::is_eulerian() {
 		odd_counter = 0;
 	}
 	return true;
+}
+
+bool Generator::is_connected() {
+	bool tmp;
+	for (int i = 0; i < this->v_nr; i++) {
+		tmp = 0;
+		for (int j = 0; j < this->v_nr; j++) {
+			if (this->is_edge(i, j)) {
+				tmp = 1;
+				break;
+			}
+		}
+	}
+	return tmp;
 }
