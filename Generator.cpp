@@ -106,118 +106,37 @@ bool Generator::connected_generate() {
 }
 
 bool Generator::euler_generate() {
-	this->connected_generate();
-
-	if (this->saturation >= 0.1) {
-		for (int i = 0; i < this->v_nr; i++) {
-			for (int j = 0; j < this->v_nr; j++) {
-				if (i == j) {
-					continue;
-				}
-				this->graph[i][j] = 1;
+	for (int i = 0; i < this->v_nr; i++) {
+		for (int j = 0; j < this->v_nr; j++) {
+			if (i == j) {
+				continue;
 			}
+			this->graph[i][j] = 1;
 		}
-		int edge_count = this->v_nr * (this->v_nr - 1) / 2;
-		if (this->v_nr % 2 == 0) {
-			for (int i = this->v_nr - 1; i >= 0; i--) {
-				this->del(i, this->v_nr - 1 - i);
-			}
-			edge_count = this->v_nr * (this->v_nr - 2) / 2;
-		}
-		int triangle[3];
-		int odd_counter = 0;
-		while (edge_count - this->e_nr >= 2) {
-			triangle[0] = rand() % this->v_nr;
-			triangle[1] = rand() % this->v_nr;
-			triangle[2] = rand() % this->v_nr;
-			while (!this->is_edge(triangle[0], triangle[1]) || !this->is_edge(triangle[1], triangle[2]) || !this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
-				triangle[odd_counter % 3] = rand() % this->v_nr;
-				odd_counter++;
-			}
-			this->del(triangle[0], triangle[1]);
-			this->del(triangle[1], triangle[2]);
-			this->del(triangle[2], triangle[0]);
-			edge_count -= 3;
-			//std::cout << std::endl;
-			//this->display();
-		}
-		return this->is_eulerian();
 	}
-	/*
-	else {
-	//usunac ostatni wierzcholek
-		std::cout << "weszlo" << std::endl;
-		std::vector<int> odd;
-		int odd_counter = 0;
-		for (int i = 0; i < this->v_nr; i++) {
-			for (int j = 0; j < this->v_nr; j++) {
-				if (this->is_edge(i, j)) {
-					odd_counter++;
-				}
-			}
-			if (odd_counter % 2 != 0) {
-				odd.push_back(i);
-			}
-			odd_counter = 0;
+	int edge_count = this->v_nr * (this->v_nr - 1) / 2;
+	if (this->v_nr % 2 == 0) {
+		for (int i = this->v_nr - 1; i >= 0; i--) {
+			this->del(i, this->v_nr - 1 - i);
 		}
-
-		if (odd.size() == 0) {
-			return false;
-		}
-
-		int connect[2];
-		odd_counter = 0;
-		while (odd.size() > 2) {
-			connect[0] = rand() % odd.size();
-			connect[1] = rand() % odd.size();
-			while (connect[0] == connect[1] || is_edge(odd.at(connect[0]), odd.at(connect[1]))) {
-				connect[odd_counter % 2] = rand() % odd.size();
-				odd_counter++;
-			}
-			this->add(odd.at(connect[0]), odd.at(connect[1]));
-			odd.erase(odd.begin() + connect[0]);
-			if (connect[0] < connect[1]) {
-				connect[1]--;
-			}
-			odd.erase(odd.begin() + connect[1]);
-		}
-		if (odd.size() == 2) {
-			this->add(odd.at(0), this->v_nr - 1);
-			this->add(odd.at(1), this->v_nr - 1);
-		}
-		
-		int edge_count = 0;
-		for (int i = 0; i < this->v_nr; i++) {
-			for (int j = 0; j < this->v_nr; j++) {
-				if (this->graph[i][j] == 1) {
-					edge_count++;
-				}
-			}
-		}
-		edge_count /= 2;
-		int triangle[3];
-		odd_counter = 0;
-		while (this->e_nr - edge_count >= 2) {
-			triangle[0] = rand() % this->v_nr;
-			triangle[1] = rand() % this->v_nr;
-			triangle[2] = rand() % this->v_nr;
-			while (this->is_edge(triangle[0], triangle[1]) || this->is_edge(triangle[1], triangle[2]) || this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
-				triangle[odd_counter % 3] = rand() % this->v_nr;
-				odd_counter++;
-			}
-			this->add(triangle[0], triangle[1]);
-			this->add(triangle[1], triangle[2]);
-			this->add(triangle[2], triangle[0]);
-			edge_count += 3;
-			std::cout << std::endl;
-			this->display();
-		}
-		if (!this->is_eulerian()) {
-			return false;
-		}
-		return true;
+		edge_count = this->v_nr * (this->v_nr - 2) / 2;
 	}
-	*/
+	int triangle[3];
+	int odd_counter = 0;
+	while (edge_count - this->e_nr >= 2) {
+		triangle[0] = rand() % this->v_nr;
+		triangle[1] = rand() % this->v_nr;
+		triangle[2] = rand() % this->v_nr;
+		while (!this->is_edge(triangle[0], triangle[1]) || !this->is_edge(triangle[1], triangle[2]) || !this->is_edge(triangle[2], triangle[0]) || triangle[0] == triangle[1] || triangle[1] == triangle[2] || triangle[2] == triangle[0]) {
+			triangle[odd_counter % 3] = rand() % this->v_nr;
+			odd_counter++;
+		}
+		this->del(triangle[0], triangle[1]);
+		this->del(triangle[1], triangle[2]);
+		this->del(triangle[2], triangle[0]);
+		edge_count -= 3;
+	}
+	return this->is_eulerian();
 }
 
 bool Generator::is_eulerian() {
@@ -245,6 +164,9 @@ bool Generator::is_connected() {
 				tmp = 1;
 				break;
 			}
+		}
+		if (!tmp) {
+			return false;
 		}
 	}
 	return tmp;
