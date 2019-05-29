@@ -71,7 +71,7 @@ void Generator::display() {
 }
 
 bool Generator::connected_generate() {
-	int * unvisited = new int [this->v_nr - 1];
+	int * unvisited = new int [this->v_nr];
 	for (int i = 0; i < this->v_nr; i++) {
 		unvisited[i] = i;
 	}
@@ -101,6 +101,32 @@ bool Generator::connected_generate() {
 		visited[visited_pointer++] = unvisited_stack.top();
 		unvisited_stack.pop();
 
+	}
+	return this->is_connected();
+}
+
+bool Generator::hamilton_generate() {
+	this->connected_generate();
+	int edge_count = 0;
+	for (int i = 0; i < this->v_nr; i++) {
+		for (int j = 0; j < this->v_nr; j++) {
+			if (this->is_edge(i, j)) {
+				edge_count++;
+			}
+		}
+	}
+	edge_count /= 2;
+	int odd_counter = 0;
+	int to_connect[2];
+	while (this->e_nr - edge_count >= 2) {
+		to_connect[0] = rand() % this->v_nr;
+		to_connect[1] = rand() % this->v_nr;
+		while (this->is_edge(to_connect[0], to_connect[1]) || to_connect[0] == to_connect[1]) {
+			to_connect[odd_counter % 2] = rand() % this->v_nr;
+			odd_counter++;
+		}
+		this->add(to_connect[0], to_connect[1]);
+		edge_count++;
 	}
 	return this->is_connected();
 }

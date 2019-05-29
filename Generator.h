@@ -9,6 +9,7 @@ class Generator {
 		bool del(int a, int b);
 		bool connected_generate();
 		bool euler_generate();
+		bool hamilton_generate();
 		bool is_edge(int a, int b);
 		void display();
 		bool is_eulerian();
