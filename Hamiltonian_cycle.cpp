@@ -13,6 +13,7 @@ Hamiltonian_cycle::Hamiltonian_cycle(int v_nr, float saturation) {
 	for (int i = 0; i < this->v_nr + 1; i++) {
 		this->possible[i] = true;
 	}
+	this->stop = false;
 }
 
 Hamiltonian_cycle::~Hamiltonian_cycle() {
@@ -28,6 +29,9 @@ Hamiltonian_cycle::~Hamiltonian_cycle() {
 		delete [] this->output_arr;
 		this->output_arr = NULL;
 	}
+	this->begin = 0;
+	this->end = 0;
+	this->stop = false;
 }
 
 void Hamiltonian_cycle::display() {

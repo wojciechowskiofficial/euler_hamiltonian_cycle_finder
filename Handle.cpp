@@ -125,7 +125,107 @@ void Handle::hamilton_handle() {
 		output << v << " " << acc << std::endl;
 		std::cout << "srednia " << v << " " << acc << std::endl;
 		acc = 0.0;
-		v += 100;
+		v += 50;
+	}
+
+	v = 100;
+	output << "0.3" << std::endl;
+	std::cout << "0.3" << std::endl;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			hamilton = new Hamiltonian_cycle(v, 0.3);
+			hamilton->load();
+			tmp_measuring = hamilton->perform();
+			std::cout << v << " " << tmp_measuring << std::endl;
+			acc += tmp_measuring;
+			delete hamilton;
+			hamilton = NULL;
+		}
+		acc /= 10;
+		output << v << " " << acc << std::endl;
+		std::cout << "srednia " << v << " " << acc << std::endl;
+		acc = 0.0;
+		v += 50;
+	}
+
+	v = 100;
+	output << "0.4" << std::endl;
+	std::cout << "0.4" << std::endl;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			hamilton = new Hamiltonian_cycle(v, 0.4);
+			hamilton->load();
+			tmp_measuring = hamilton->perform();
+			std::cout << v << " " << tmp_measuring << std::endl;
+			acc += tmp_measuring;
+			delete hamilton;
+			hamilton = NULL;
+		}
+		acc /= 10;
+		output << v << " " << acc << std::endl;
+		std::cout << "srednia " << v << " " << acc << std::endl;
+		acc = 0.0;
+		v += 50;
+	}
+
+	v = 100;
+	output << "0.6" << std::endl;
+	std::cout << "0.6" << std::endl;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			hamilton = new Hamiltonian_cycle(v, 0.6);
+			hamilton->load();
+			tmp_measuring = hamilton->perform();
+			std::cout << v << " " << tmp_measuring << std::endl;
+			acc += tmp_measuring;
+			delete hamilton;
+			hamilton = NULL;
+		}
+		acc /= 10;
+		output << v << " " << acc << std::endl;
+		std::cout << "srednia " << v << " " << acc << std::endl;
+		acc = 0.0;
+		v += 50;
+	}
+
+	v = 100;
+	output << "0.8" << std::endl;
+	std::cout << "0.8" << std::endl;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			hamilton = new Hamiltonian_cycle(v, 0.8);
+			hamilton->load();
+			tmp_measuring = hamilton->perform();
+			std::cout << v << " " << tmp_measuring << std::endl;
+			acc += tmp_measuring;
+			delete hamilton;
+			hamilton = NULL;
+		}
+		acc /= 10;
+		output << v << " " << acc << std::endl;
+		std::cout << "srednia " << v << " " << acc << std::endl;
+		acc = 0.0;
+		v += 50;
+	}
+
+	v = 100;
+	output << "0.95" << std::endl;
+	std::cout << "0.95" << std::endl;
+	for (int i = 0; i < 10; i++) {
+		for (int j = 0; j < 10; j++) {
+			hamilton = new Hamiltonian_cycle(v, 0.95);
+			hamilton->load();
+			tmp_measuring = hamilton->perform();
+			std::cout << v << " " << tmp_measuring << std::endl;
+			acc += tmp_measuring;
+			delete hamilton;
+			hamilton = NULL;
+		}
+		acc /= 10;
+		output << v << " " << acc << std::endl;
+		std::cout << "srednia " << v << " " << acc << std::endl;
+		acc = 0.0;
+		v += 50;
 	}
 	output.close();
 }
